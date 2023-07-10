@@ -5,21 +5,28 @@ import Notification from './Notification/Notification.jsx';
 import Section from './Section/Section.jsx';
 
 export const App = () => {
-  const [feedback, addFeedback] = useState({
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  });
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
 
-  const handleIncrement = option => {
-    addFeedback(prevState => ({
-      ...prevState,
-      [option]: prevState[option] + 1,
-    }));
+  const handleIncrement = type => {
+    switch (type) {
+      case 'good':
+        setGood(prevGood => prevGood + 1);
+        break;
+      case 'neutral':
+        setNeutral(prevNeutral => prevNeutral + 1);
+        break;
+      case 'bad':
+        setBad(prevBad => prevBad + 1);
+        break;
+      default:
+        console.log('default');
+    }
   };
 
   const countTotalFeedback = () => {
-    return Object.values(feedback).reduce((total, value) => total + value, 0);
+    return good + neutral + bad;
   };
 
   const countPositiveFeedbackPercentage = () => {
@@ -29,15 +36,16 @@ export const App = () => {
       return 0;
     }
 
-    return Math.round((feedback.good / totalFeedback) * 100);
+    return Math.round((good / totalFeedback) * 100);
   };
-
-  const optionsBtn = Object.keys(feedback);
 
   return (
     <div>
       <Section title="Leave your feedback">
-        <FeedbackOptions options={optionsBtn} onFeedback={handleIncrement} />
+        <FeedbackOptions
+          options={['good', 'neutral', 'bad']}
+          onFeedback={handleIncrement}
+        />
       </Section>
 
       {countTotalFeedback() === 0 ? (
@@ -45,7 +53,9 @@ export const App = () => {
       ) : (
         <Section title="Statistics">
           <Statistics
-            {...feedback}
+            good={good}
+            neutral={neutral}
+            bad={bad}
             total={countTotalFeedback()}
             positivePercentage={countPositiveFeedbackPercentage()}
           />
